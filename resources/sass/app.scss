@@ -1,0 +1,32 @@
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+
+.grid {
+    height: 400px;
+    width: 400px;
+    display: flex;
+    flex-wrap: wrap;
+    background-color: gray;
+}
+
+.grid div {
+    height: 40px;
+    width: 40px;
+    text-align: center;
+    padding-top: 6px;
+}
+
+.bomb {
+    background-color: orange;
+}
+
+.checked {
+    background-color: red;
+}
