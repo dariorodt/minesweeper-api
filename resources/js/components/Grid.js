@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-class Example extends React.Component {
+class Grid extends React.Component {
     width = 10;
     cells = this.width * this.width;
     squares = [];
@@ -80,7 +80,7 @@ class Example extends React.Component {
                 square.innerHTML = total;
                 return;
             }
-            this.checkSquare(square, currentId)
+            this.checkSquare(square, currentId);
         }
         square.classList.add('checked');
     }
@@ -146,30 +146,30 @@ class Example extends React.Component {
 
     gameOver(square) {
         // result.innerHTML = 'BOOM! Game Over!'
-        this.isGameOver = true
+        this.isGameOver = true;
 
         //show ALL the bombs
         this.squares.forEach(square => {
           if (square.classList.contains('bomb')) {
-            square.innerHTML = '💣'
-            square.classList.remove('bomb')
-            square.classList.add('checked')
+            square.innerHTML = '💣';
+            square.classList.remove('bomb');
+            square.classList.add('checked');
           }
         })
     }
 
     checkForWin() {
         ///simplified win argument
-        let matches = 0
+        let matches = 0;
         const result = document.getElementById('result');
 
         for (let i = 0; i < this.squares.length; i++) {
             if (this.squares[i].classList.contains('flag') && this.squares[i].classList.contains('bomb')) {
-              matches ++
+              matches ++;
             }
             if (matches === this.bombAmount) {
-                result.innerHTML = 'YOU WIN!'
-                this.isGameOver = true
+                result.innerHTML = 'YOU WIN!';
+                this.isGameOver = true;
             }
         }
     }
@@ -207,8 +207,8 @@ class Example extends React.Component {
     }
 }
 
-export default Example;
+export default Grid;
 
 if (document.getElementById('example')) {
-    ReactDOM.render(<Example />, document.getElementById('example'));
+    ReactDOM.render(<Grid />, document.getElementById('example'));
 }

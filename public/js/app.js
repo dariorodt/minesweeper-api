@@ -1853,7 +1853,7 @@ __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
  */
 
 
-__webpack_require__(/*! ./components/Example */ "./resources/js/components/Example.js");
+__webpack_require__(/*! ./components/Grid */ "./resources/js/components/Grid.js");
 
 /***/ }),
 
@@ -1901,10 +1901,10 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 /***/ }),
 
-/***/ "./resources/js/components/Example.js":
-/*!********************************************!*\
-  !*** ./resources/js/components/Example.js ***!
-  \********************************************/
+/***/ "./resources/js/components/Grid.js":
+/*!*****************************************!*\
+  !*** ./resources/js/components/Grid.js ***!
+  \*****************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -1944,15 +1944,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
-var Example = /*#__PURE__*/function (_React$Component) {
-  _inherits(Example, _React$Component);
+var Grid = /*#__PURE__*/function (_React$Component) {
+  _inherits(Grid, _React$Component);
 
-  var _super = _createSuper(Example);
+  var _super = _createSuper(Grid);
 
-  function Example(props) {
+  function Grid(props) {
     var _this;
 
-    _classCallCheck(this, Example);
+    _classCallCheck(this, Grid);
 
     _this = _super.call(this, props);
 
@@ -1971,7 +1971,7 @@ var Example = /*#__PURE__*/function (_React$Component) {
     return _this;
   }
 
-  _createClass(Example, [{
+  _createClass(Grid, [{
     key: "createBoard",
     value: function createBoard() {
       var _this2 = this;
@@ -2227,13 +2227,13 @@ var Example = /*#__PURE__*/function (_React$Component) {
     }
   }]);
 
-  return Example;
+  return Grid;
 }(react__WEBPACK_IMPORTED_MODULE_0__.Component);
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Example);
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Grid);
 
 if (document.getElementById('example')) {
-  react_dom__WEBPACK_IMPORTED_MODULE_1__.render( /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(Example, {}), document.getElementById('example'));
+  react_dom__WEBPACK_IMPORTED_MODULE_1__.render( /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(Grid, {}), document.getElementById('example'));
 }
 
 /***/ }),
