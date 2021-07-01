@@ -15,8 +15,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('games')->group(function () {
-    Route::get('show/{game}', [App\Http\Controllers\GameController::class, 'show']);
-    Route::post('save', [App\Http\Controllers\GameController::class, 'store']);
+    Route::get('/', [App\Http\Controllers\GameController::class, 'index']);
+    Route::get('/show/{game}', [App\Http\Controllers\GameController::class, 'show']);
+    Route::post('/save', [App\Http\Controllers\GameController::class, 'store']);
+    Route::post('/create', [App\Http\Controllers\GameController::class, 'create']);
+    Route::put("/update/{game}", [App\Http\Controllers\GameController::class, 'update']);
+    Route::delete("/delete/{game}", [App\Http\Controllers\GameController::class, 'delete']);
 });
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {

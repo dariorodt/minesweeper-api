@@ -31,9 +31,34 @@ class GameController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         // Create a new game
+        //dd($request->all());
+
+        $width = $request->width;
+        $cells = $width * $width;
+        $bomb_amount = $request->bombAmount;
+        $bombs_array = array_fill(0, $bomb_amount, "bomb");
+        $valid_array = array_fill(0, $cells - $bomb_amount, "valid");
+        $grid = array_merge($bombs_array, $valid_array);
+        shuffle($grid);
+        $status = "active";
+        $elapsed_time = "00:00";
+        $user_id = "1";
+
+        $game = new Game;
+
+        $game->width = $width;
+        $game->bomb_amount = $bomb_amount;
+        $game->grid = json_encode($grid);
+        $game->status = $status;
+        $game->elapsed_time = $elapsed_time;
+        $game->user_id = $user_id;
+
+        $game->save();
+
+        return response()->json($game);
     }
 
     /**
@@ -75,7 +100,13 @@ class GameController extends Controller
      */
     public function update(Request $request, Game $game)
     {
-        //
+        // Update the state of a saved game
+        $game->grid = json_encode($request->grid);
+        $game->status = $request->status;
+        $game->elapsed_time = $request->elapsed_time;
+        $game->user_id = $request->user_id;
+        $game->save();
+        return response()->json($request->all());
     }
 
     /**
@@ -84,8 +115,9 @@ class GameController extends Controller
      * @param  \App\Models\Game  $game
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Game $game)
+    public function delete(Game $game)
     {
-        //
+        $game->delete();
+        return response()->json(["deleted" => true]);
     }
 }
