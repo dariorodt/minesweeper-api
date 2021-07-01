@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Axios from 'axios';
 
 class Grid extends React.Component {
     width = 10;
@@ -8,11 +9,15 @@ class Grid extends React.Component {
     bombAmount = 12;
     isGameOver = false;
     flags = 0;
+    time = "00:00";
 
     constructor(props) {
         super(props);
     }
 
+    saveGame() {
+
+    }
 
     createBoard() {
         let grid = document.querySelector('.grid');
@@ -25,6 +30,7 @@ class Grid extends React.Component {
         const shuffledArray = secondPass.sort(() => Math.random() - 0.5);
         console.log(shuffledArray);
 
+        //
         for (let i = 0; i < this.cells; i++) {
             const square = document.createElement('div');
             square.setAttribute('id', i.toString());
@@ -181,13 +187,15 @@ class Grid extends React.Component {
             square.classList.add('flag');
             square.innerHTML = ' 🚩';
             this.flags ++;
-            document.getElementById('flagsLeft').innerHTML = (this.bombAmount - this.flags).toString();
+            document.getElementById('flagsLeft').innerHTML =
+            "Remaining flags: " + (this.bombAmount - this.flags).toString();
             this.checkForWin();
         } else {
             square.classList.remove('flag');
             square.innerHTML = '';
             this.flags--;
-            document.getElementById('flagsLeft').innerHTML = (this.bombAmount - this.flags).toString();
+            document.getElementById('flagsLeft').innerHTML =
+                "Remaining flags: " + (this.bombAmount - this.flags).toString();
           }
         }
       }
@@ -198,10 +206,16 @@ class Grid extends React.Component {
 
     render() {
         return (
-            <div>
-                <div className="grid"></div>
-                <div id="result"></div>
-                <div id="flagsLeft"></div>
+            <div className="container">
+                <div className="row">
+                    <div className="col-lg-12">
+                        <div className="grid"></div>
+                        <div id="result">In Game!</div>
+                        <div id="flagsLeft">Remaining flags: {this.bombAmount}</div>
+                        <span>Ellapsed time: {this.time}</span>
+                        <button className="float-right">Save game</button>
+                    </div>
+                </div>
             </div>
         );
     }

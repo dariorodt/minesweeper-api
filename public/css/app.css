@@ -10008,6 +10008,7 @@ h3 {
   display: flex;
   flex-wrap: wrap;
   background-color: gray;
+  margin: auto;
 }
 
 .grid div {

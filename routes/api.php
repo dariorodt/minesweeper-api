@@ -14,6 +14,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::prefix('games')->group(function () {
+    Route::get('show/{game}', [App\Http\Controllers\GameController::class, 'show']);
+    Route::post('save', [App\Http\Controllers\GameController::class, 'store']);
+});
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
