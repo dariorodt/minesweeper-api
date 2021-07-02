@@ -15,6 +15,7 @@
                     @endif
 
                     {{ __('You are logged in!') }}
+                    <a class="btn btn-primary float-right" href=" {{ route('grid') }} "> PLAY!</a>
                 </div>
             </div>
         </div>

@@ -1975,6 +1975,8 @@ var Grid = /*#__PURE__*/function (_React$Component) {
 
     _defineProperty(_assertThisInitialized(_this), "seconds", 0);
 
+    _defineProperty(_assertThisInitialized(_this), "timer", void 0);
+
     _this.state = {
       time: 0,
       id: 0
@@ -1989,7 +1991,34 @@ var Grid = /*#__PURE__*/function (_React$Component) {
   _createClass(Grid, [{
     key: "saveGame",
     value: function saveGame() {
-      alert("Game saved!");
+      var myGrid = [],
+          status = "active",
+          elapsed_time = this.seconds;
+      this.squares.forEach(function (it) {
+        myGrid.push(it.classList.value);
+      });
+      axios__WEBPACK_IMPORTED_MODULE_2___default().put("http://localhost:8000/api/games/update/" + this.state.id, {
+        grid: myGrid,
+        elapsed_time: elapsed_time,
+        status: status
+      }).then(function (resp) {
+        console.log(resp);
+      })["catch"](function (error) {
+        console.log(error);
+      });
+      var grid = document.querySelector('.grid');
+      grid.innerHTML = "";
+      this.cells = 0;
+      this.bombAmount = 0;
+      this.squares = [];
+      this.status = "";
+      this.seconds = 0;
+      this.flags = 0;
+      clearInterval(this.timer);
+      this.setState({
+        time: 0,
+        id: 0
+      });
     }
   }, {
     key: "createGame",
@@ -2032,20 +2061,15 @@ var Grid = /*#__PURE__*/function (_React$Component) {
     value: function openGame() {}
   }, {
     key: "listGames",
-    value: function listGames() {}
+    value: function listGames() {
+      alert("listing games");
+    }
   }, {
     key: "createBoard",
     value: function createBoard(shuffledArray) {
       var _this3 = this;
 
-      var grid = document.querySelector('.grid'); // const bombsArray = Array(this.bombAmount).fill('bomb');
-      // const emptyArray = Array(this.cells - this.bombAmount).fill('valid');
-      // const gameArray = emptyArray.concat(bombsArray);
-      // const firstPass = gameArray.sort(() => Math.random() -0.5);
-      // const secondPass = firstPass.sort(() => Math.random() - 0.5);
-      // const shuffledArray = secondPass.sort(() => Math.random() - 0.5);
-      // const shuffledArray = gameArray
-
+      var grid = document.querySelector('.grid');
       console.log(shuffledArray); //
 
       var _loop = function _loop(i) {
@@ -2092,7 +2116,7 @@ var Grid = /*#__PURE__*/function (_React$Component) {
         }
       }
 
-      setInterval(function () {
+      this.timer = setInterval(function () {
         _this3.setState({
           time: _this3.seconds++
         });
@@ -2318,6 +2342,10 @@ var Grid = /*#__PURE__*/function (_React$Component) {
               className: "btn btn-primary ml-1",
               onClick: this.saveGame,
               children: "Save game"
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("a", {
+              className: "btn btn-info float-right",
+              href: "/home",
+              children: "Go to Home Page"
             })]
           })
         })]

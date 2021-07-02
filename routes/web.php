@@ -20,6 +20,6 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/grid', [App\Http\Controllers\GridController::class, 'index'])->name('app.index')->name('grid');
+Route::get('/grid', [App\Http\Controllers\GridController::class, 'index'])->name('grid');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

@@ -27,9 +27,32 @@ class Grid extends React.Component {
     flags = 0;
     status = ""
     seconds = 0;
+    timer;
 
     saveGame() {
-        alert("Game saved!");
+        let myGrid = [], status = "active", elapsed_time = this.seconds;
+        this.squares.forEach(it => {
+            myGrid.push(it.classList.value);
+        })
+        Axios.put("http://localhost:8000/api/games/update/"+this.state.id, {
+            grid: myGrid,
+            elapsed_time: elapsed_time,
+            status: status
+        }).then(resp => {
+            console.log(resp);
+        }).catch(error => {
+            console.log(error);
+        });
+        let grid = document.querySelector('.grid');
+        grid.innerHTML = "";
+        this.cells = 0;
+        this.bombAmount = 0;
+        this.squares = [];
+        this.status = "";
+        this.seconds = 0;
+        this.flags = 0;
+        clearInterval(this.timer);
+        this.setState({time: 0, id: 0});
     }
 
     createGame() {
@@ -54,18 +77,12 @@ class Grid extends React.Component {
 
     openGame() {}
 
-    listGames() {}
+    listGames() {
+        alert("listing games");
+    }
 
     createBoard(shuffledArray) {
         let grid = document.querySelector('.grid');
-
-        // const bombsArray = Array(this.bombAmount).fill('bomb');
-        // const emptyArray = Array(this.cells - this.bombAmount).fill('valid');
-        // const gameArray = emptyArray.concat(bombsArray);
-        // const firstPass = gameArray.sort(() => Math.random() -0.5);
-        // const secondPass = firstPass.sort(() => Math.random() - 0.5);
-        // const shuffledArray = secondPass.sort(() => Math.random() - 0.5);
-        // const shuffledArray = gameArray
         console.log(shuffledArray);
 
         //
@@ -105,7 +122,7 @@ class Grid extends React.Component {
             }
         }
 
-        setInterval(() => {
+        this.timer = setInterval(() => {
             this.setState({time: this.seconds++});
         }, 1000);
     }
@@ -268,6 +285,7 @@ class Grid extends React.Component {
                     <div className="col-md-12">
                         <button className="btn btn-primary" onClick={this.createGame}>New game</button>
                         <button className="btn btn-primary ml-1" onClick={this.saveGame}>Save game</button>
+                        <a className="btn btn-info float-right" href="/home">Go to Home Page</a>
                     </div>
                 </div>
             </div>

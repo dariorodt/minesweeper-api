@@ -62,24 +62,6 @@ class GameController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        // Save a unfinished game into the database
-        $game = new Game;
-        $game->grid = json_encode($request->grid);
-        $game->status = $request->status;
-        $game->elapsed_time = $request->elapsed_time;
-        $game->user_id = $request->user_id;
-        $game->save();
-        return response()->json($request->all());
-    }
-
-    /**
      * Display the specified resource.
      *
      * @param  \App\Models\Game  $game
@@ -104,7 +86,6 @@ class GameController extends Controller
         $game->grid = json_encode($request->grid);
         $game->status = $request->status;
         $game->elapsed_time = $request->elapsed_time;
-        $game->user_id = $request->user_id;
         if($game->save())
             return response("success", 201);
         else
