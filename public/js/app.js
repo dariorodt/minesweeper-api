@@ -2035,21 +2035,21 @@ var Grid = /*#__PURE__*/function (_React$Component) {
       axios__WEBPACK_IMPORTED_MODULE_2___default().post("http://localhost:8000/api/games/create", {
         "width": 10,
         "bombAmount": bombAmount
-      }).then(function (response) {
-        _this2.width = response.data.width;
-        _this2.cells = response.data.width * response.data.width;
-        _this2.bombAmount = response.data.bomb_amount;
-        _this2.status = response.data.status;
+      }).then(function (resp) {
+        _this2.width = resp.data.width;
+        _this2.cells = resp.data.width * resp.data.width;
+        _this2.bombAmount = resp.data.bomb_amount;
+        _this2.status = resp.data.status;
 
         _this2.setState({
-          time: response.data.elapsed_time
+          time: resp.data.elapsed_time
         });
 
         _this2.setState({
-          id: response.data.id
+          id: resp.data.id
         });
 
-        _this2.createBoard(JSON.parse(response.data.grid));
+        _this2.createBoard(JSON.parse(resp.data.grid));
 
         console.log("Bomb amount: " + _this2.bombAmount);
       })["catch"](function (error) {
@@ -2058,42 +2058,90 @@ var Grid = /*#__PURE__*/function (_React$Component) {
     }
   }, {
     key: "openGame",
-    value: function openGame() {}
+    value: function openGame(game) {
+      var _this3 = this;
+
+      console.log("opening game: " + game);
+      axios__WEBPACK_IMPORTED_MODULE_2___default().get('http://localhost:8000/api/games/' + game).then(function (resp) {
+        console.log(resp.data);
+        _this3.width = resp.data.width;
+        _this3.cells = resp.data.width * resp.data.width;
+        _this3.bombAmount = resp.data.bomb_amount;
+        _this3.status = resp.data.status;
+        _this3.seconds = resp.data.elapsed_time;
+
+        _this3.setState({
+          time: resp.data.elapsed_time
+        });
+
+        _this3.setState({
+          id: resp.data.id
+        });
+
+        _this3.createBoard(JSON.parse(resp.data.grid));
+
+        console.log("Bomb amount: " + _this3.bombAmount);
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    }
   }, {
     key: "listGames",
     value: function listGames() {
-      alert("listing games");
+      var _this4 = this;
+
+      var tableList = document.querySelector('#tableList');
+      axios__WEBPACK_IMPORTED_MODULE_2___default().get('http://localhost:8000/api/games').then(function (resp) {
+        //console.log(resp.data);
+        var data = resp.data;
+
+        var _loop = function _loop(i) {
+          var row = document.createElement('tr'); // Id, Bombs, Status, Seconds
+
+          row.innerHTML = "<td>" + data[i].id + "</tr>" + "<td>" + data[i].bomb_amount + "</tr>" + "<td>" + data[i].status + "</tr>" + "<td>" + data[i].elapsed_time + "</tr>";
+          row.addEventListener('click', function (e) {
+            _this4.openGame(data[i].id);
+          });
+          tableList.appendChild(row);
+        };
+
+        for (var i = 0; i < data.length; i++) {
+          _loop(i);
+        }
+      })["catch"](function (error) {
+        console.log(error);
+      });
     }
   }, {
     key: "createBoard",
     value: function createBoard(shuffledArray) {
-      var _this3 = this;
+      var _this5 = this;
 
       var grid = document.querySelector('.grid');
       console.log(shuffledArray); //
 
-      var _loop = function _loop(i) {
+      var _loop2 = function _loop2(i) {
         var square = document.createElement('div');
         square.setAttribute('id', i.toString());
         square.classList.add(shuffledArray[i]);
         grid.appendChild(square);
 
-        _this3.squares.push(square); //normal click
+        _this5.squares.push(square); //normal click
 
 
         square.addEventListener('click', function (e) {
-          _this3.click(square);
+          _this5.click(square);
         }); //cntrl and left click
 
         square.oncontextmenu = function (e) {
           e.preventDefault();
 
-          _this3.addFlag(square);
+          _this5.addFlag(square);
         };
       };
 
       for (var i = 0; i < this.cells; i++) {
-        _loop(i);
+        _loop2(i);
       }
 
       for (var _i = 0; _i < this.squares.length; _i++) {
@@ -2117,8 +2165,8 @@ var Grid = /*#__PURE__*/function (_React$Component) {
       }
 
       this.timer = setInterval(function () {
-        _this3.setState({
-          time: _this3.seconds++
+        _this5.setState({
+          time: _this5.seconds++
         });
       }, 1000);
     }
@@ -2153,7 +2201,7 @@ var Grid = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "checkSquare",
     value: function checkSquare(square, currentId) {
-      var _this4 = this;
+      var _this6 = this;
 
       console.log("Check. Current id: " + currentId);
       var inLeft = currentId % this.width === 0;
@@ -2162,82 +2210,82 @@ var Grid = /*#__PURE__*/function (_React$Component) {
       if (inLeft) console.log("In left edge...");
       setTimeout(function () {
         if (currentId >= 0 && !inLeft) {
-          var newId = _this4.squares[parseInt(currentId) - 1].id;
+          var newId = _this6.squares[parseInt(currentId) - 1].id;
 
           console.log("Next id is: " + newId);
           var newSquare = document.getElementById(newId);
 
-          _this4.click(newSquare);
+          _this6.click(newSquare);
         }
 
         if (currentId >= 9 && !inRight) {
-          var _newId = _this4.squares[parseInt(currentId) + 1 - _this4.width].id;
+          var _newId = _this6.squares[parseInt(currentId) + 1 - _this6.width].id;
 
           console.log("Next id is: " + _newId);
 
           var _newSquare = document.getElementById(_newId);
 
-          _this4.click(_newSquare);
+          _this6.click(_newSquare);
         }
 
         if (currentId >= 10) {
-          var _newId2 = _this4.squares[parseInt(currentId) - _this4.width].id;
+          var _newId2 = _this6.squares[parseInt(currentId) - _this6.width].id;
 
           console.log("Next id is: " + _newId2);
 
           var _newSquare2 = document.getElementById(_newId2);
 
-          _this4.click(_newSquare2);
+          _this6.click(_newSquare2);
         }
 
         if (currentId >= 11 && !inLeft) {
-          var _newId3 = _this4.squares[parseInt(currentId) - 1 - _this4.width].id;
+          var _newId3 = _this6.squares[parseInt(currentId) - 1 - _this6.width].id;
 
           console.log("Next id is: " + _newId3);
 
           var _newSquare3 = document.getElementById(_newId3);
 
-          _this4.click(_newSquare3);
+          _this6.click(_newSquare3);
         }
 
         if (currentId <= 98 && !inRight) {
-          var _newId4 = _this4.squares[parseInt(currentId) + 1].id;
+          var _newId4 = _this6.squares[parseInt(currentId) + 1].id;
 
           console.log("Next id is: " + _newId4);
 
           var _newSquare4 = document.getElementById(_newId4);
 
-          _this4.click(_newSquare4);
+          _this6.click(_newSquare4);
         }
 
         if (currentId <= 90 && !inLeft) {
-          var _newId5 = _this4.squares[parseInt(currentId) - 1 + _this4.width].id;
+          var _newId5 = _this6.squares[parseInt(currentId) - 1 + _this6.width].id;
 
           console.log("Next id is: " + _newId5);
 
           var _newSquare5 = document.getElementById(_newId5);
 
-          _this4.click(_newSquare5);
+          _this6.click(_newSquare5);
         }
 
         if (currentId <= 88 && !inRight) {
-          var _newId6 = _this4.squares[parseInt(currentId) + 1 + _this4.width].id;
+          var _newId6 = _this6.squares[parseInt(currentId) + 1 + _this6.width].id;
 
           console.log("Next id is: " + _newId6);
 
           var _newSquare6 = document.getElementById(_newId6);
 
-          _this4.click(_newSquare6);
+          _this6.click(_newSquare6);
         }
 
         if (currentId <= 89) {
-          var _newId7 = _this4.squares[parseInt(currentId) + _this4.width].id;
+          var _newId7 = _this6.squares[parseInt(currentId) + _this6.width].id;
 
           console.log("Next id is: " + _newId7);
 
           var _newSquare7 = document.getElementById(_newId7);
 
-          _this4.click(_newSquare7);
+          _this6.click(_newSquare7);
         }
       }, 10);
     }
@@ -2295,7 +2343,9 @@ var Grid = /*#__PURE__*/function (_React$Component) {
     }
   }, {
     key: "componentDidMount",
-    value: function componentDidMount() {//this.createBoard();
+    value: function componentDidMount() {
+      //this.createBoard();
+      this.listGames();
     }
   }, {
     key: "render",
@@ -2347,6 +2397,29 @@ var Grid = /*#__PURE__*/function (_React$Component) {
               href: "/home",
               children: "Go to Home Page"
             })]
+          })
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+          className: "row mt-2",
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+            className: "col-lg-12",
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("table", {
+              className: "table table-hover",
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("thead", {
+                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("tr", {
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("th", {
+                    children: "Id"
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("th", {
+                    children: "Bombs"
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("th", {
+                    children: "Status"
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("th", {
+                    children: "Seconds"
+                  })]
+                })
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("tbody", {
+                id: "tableList"
+              })]
+            })
           })
         })]
       });

@@ -61,24 +61,59 @@ class Grid extends React.Component {
         Axios.post("http://localhost:8000/api/games/create", {
             "width": 10,
             "bombAmount": bombAmount
-        }).then((response) => {
-            this.width = response.data.width;
-            this.cells = response.data.width * response.data.width;
-            this.bombAmount = response.data.bomb_amount;
-            this.status = response.data.status;
-            this.setState({time: response.data.elapsed_time});
-            this.setState({id: response.data.id});
-            this.createBoard(JSON.parse(response.data.grid));
+        }).then(resp => {
+            this.width = resp.data.width;
+            this.cells = resp.data.width * resp.data.width;
+            this.bombAmount = resp.data.bomb_amount;
+            this.status = resp.data.status;
+            this.setState({time: resp.data.elapsed_time});
+            this.setState({id: resp.data.id});
+            this.createBoard(JSON.parse(resp.data.grid));
             console.log("Bomb amount: " + this.bombAmount);
         }).catch((error) => {
             console.log(error);
         });
     }
 
-    openGame() {}
+    openGame(game) {
+        console.log("opening game: " + game);
+        Axios.get('http://localhost:8000/api/games/'+game).then(resp => {
+            console.log(resp.data);
+            this.width = resp.data.width;
+            this.cells = resp.data.width * resp.data.width;
+            this.bombAmount = resp.data.bomb_amount;
+            this.status = resp.data.status;
+            this.seconds = resp.data.elapsed_time;
+            this.setState({time: resp.data.elapsed_time});
+            this.setState({id: resp.data.id});
+            this.createBoard(JSON.parse(resp.data.grid));
+            console.log("Bomb amount: " + this.bombAmount);
+        }).catch(error => {
+            console.log(error);
+        });
+    }
 
     listGames() {
-        alert("listing games");
+        let tableList = document.querySelector('#tableList');
+        Axios.get('http://localhost:8000/api/games').then(resp => {
+            //console.log(resp.data);
+            const data = resp.data;
+            for(let i = 0; i < data.length; i++) {
+                const row = document.createElement('tr');
+                // Id, Bombs, Status, Seconds
+                row.innerHTML =
+                    "<td>"+data[i].id+"</tr>"+
+                    "<td>"+data[i].bomb_amount+"</tr>"+
+                    "<td>"+data[i].status+"</tr>"+
+                    "<td>"+data[i].elapsed_time+"</tr>";
+                row.addEventListener('click', (e) => {
+                    this.openGame(data[i].id);
+                });
+                tableList.appendChild(row);
+            }
+        }).catch(error => {
+            console.log(error);
+        })
     }
 
     createBoard(shuffledArray) {
@@ -261,6 +296,7 @@ class Grid extends React.Component {
 
     componentDidMount() {
         //this.createBoard();
+        this.listGames();
     }
 
     render() {
@@ -286,6 +322,22 @@ class Grid extends React.Component {
                         <button className="btn btn-primary" onClick={this.createGame}>New game</button>
                         <button className="btn btn-primary ml-1" onClick={this.saveGame}>Save game</button>
                         <a className="btn btn-info float-right" href="/home">Go to Home Page</a>
+                    </div>
+                </div>
+                <div className="row mt-2">
+                    <div className="col-lg-12">
+                        <table className="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Bombs</th>
+                                    <th>Status</th>
+                                    <th>Seconds</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableList">
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
