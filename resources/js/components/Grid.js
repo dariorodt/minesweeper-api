@@ -3,31 +3,69 @@ import ReactDOM from 'react-dom';
 import Axios from 'axios';
 
 class Grid extends React.Component {
-    width = 10;
-    cells = this.width * this.width;
-    squares = [];
-    bombAmount = 12;
-    isGameOver = false;
-    flags = 0;
-    time = "00:00";
 
     constructor(props) {
         super(props);
+
+        this.state = {
+            time: 0,
+            id: 0,
+
+        };
+
+        this.saveGame = this.saveGame.bind(this);
+        this.createGame = this.createGame.bind(this);
+        this.openGame = this.openGame.bind(this);
+        this.listGames = this.listGames.bind(this);
     }
+
+    width = 10;
+    cells = 0;
+    bombAmount = 0;
+    squares = [];
+    isGameOver = false;
+    flags = 0;
+    status = ""
+    seconds = 0;
 
     saveGame() {
-
+        alert("Game saved!");
     }
 
-    createBoard() {
+    createGame() {
+        let bombAmount = prompt("Enter bomb amount (max 50)");
+        if (Number(bombAmount) > 50) { alert("Bomb amount should be less than 50"); return; }
+        Axios.post("http://localhost:8000/api/games/create", {
+            "width": 10,
+            "bombAmount": bombAmount
+        }).then((response) => {
+            this.width = response.data.width;
+            this.cells = response.data.width * response.data.width;
+            this.bombAmount = response.data.bomb_amount;
+            this.status = response.data.status;
+            this.setState({time: response.data.elapsed_time});
+            this.setState({id: response.data.id});
+            this.createBoard(JSON.parse(response.data.grid));
+            console.log("Bomb amount: " + this.bombAmount);
+        }).catch((error) => {
+            console.log(error);
+        });
+    }
+
+    openGame() {}
+
+    listGames() {}
+
+    createBoard(shuffledArray) {
         let grid = document.querySelector('.grid');
 
-        const bombsArray = Array(this.bombAmount).fill('bomb');
-        const emptyArray = Array(this.cells - this.bombAmount).fill('valid');
-        const gameArray = emptyArray.concat(bombsArray);
-        const firstPass = gameArray.sort(() => Math.random() -0.5);
-        const secondPass = firstPass.sort(() => Math.random() - 0.5);
-        const shuffledArray = secondPass.sort(() => Math.random() - 0.5);
+        // const bombsArray = Array(this.bombAmount).fill('bomb');
+        // const emptyArray = Array(this.cells - this.bombAmount).fill('valid');
+        // const gameArray = emptyArray.concat(bombsArray);
+        // const firstPass = gameArray.sort(() => Math.random() -0.5);
+        // const secondPass = firstPass.sort(() => Math.random() - 0.5);
+        // const shuffledArray = secondPass.sort(() => Math.random() - 0.5);
+        // const shuffledArray = gameArray
         console.log(shuffledArray);
 
         //
@@ -39,7 +77,6 @@ class Grid extends React.Component {
             this.squares.push(square);
             //normal click
             square.addEventListener('click', (e) => {
-                e.preventDefault();
                 this.click(square);
             });
 
@@ -67,9 +104,14 @@ class Grid extends React.Component {
                 this.squares[i].setAttribute('data', total);
             }
         }
+
+        setInterval(() => {
+            this.setState({time: this.seconds++});
+        }, 1000);
     }
 
     click(square) {
+        console.log("Square clicked!")
         let currentId = square.id;
         if (this.isGameOver) return;
         if (square.classList.contains('checked') || square.classList.contains('flag')) return;
@@ -92,9 +134,9 @@ class Grid extends React.Component {
     }
 
     checkSquare(square, currentId) {
+        console.log("Check. Current id: " + currentId);
         const inLeft = currentId % this.width === 0;
         const inRight = currentId % this.width === this.width - 1;
-        console.log("Check. Current id: " + currentId);
         if (inRight) console.log("In right edge...");
         if (inLeft) console.log("In left edge...");
 
@@ -201,19 +243,31 @@ class Grid extends React.Component {
       }
 
     componentDidMount() {
-        this.createBoard();
+        //this.createBoard();
     }
 
     render() {
         return (
             <div className="container">
                 <div className="row">
+                    <div className="col-lg-12"></div>
+                </div>
+                <div className="row">
                     <div className="col-lg-12">
                         <div className="grid"></div>
-                        <div id="result">In Game!</div>
-                        <div id="flagsLeft">Remaining flags: {this.bombAmount}</div>
-                        <span>Ellapsed time: {this.time}</span>
-                        <button className="float-right">Save game</button>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col-lg-12">
+                        <span id="result"></span>
+                        <span className="my-auto" id="flagsLeft">Remaining flags: {this.bombAmount}</span>
+                        <span className="float-right">Ellapsed time: {this.state.time.toString()}</span>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col-md-12">
+                        <button className="btn btn-primary" onClick={this.createGame}>New game</button>
+                        <button className="btn btn-primary ml-1" onClick={this.saveGame}>Save game</button>
                     </div>
                 </div>
             </div>

@@ -1961,42 +1961,91 @@ var Grid = /*#__PURE__*/function (_React$Component) {
 
     _defineProperty(_assertThisInitialized(_this), "width", 10);
 
-    _defineProperty(_assertThisInitialized(_this), "cells", _this.width * _this.width);
+    _defineProperty(_assertThisInitialized(_this), "cells", 0);
+
+    _defineProperty(_assertThisInitialized(_this), "bombAmount", 0);
 
     _defineProperty(_assertThisInitialized(_this), "squares", []);
-
-    _defineProperty(_assertThisInitialized(_this), "bombAmount", 12);
 
     _defineProperty(_assertThisInitialized(_this), "isGameOver", false);
 
     _defineProperty(_assertThisInitialized(_this), "flags", 0);
 
-    _defineProperty(_assertThisInitialized(_this), "time", "00:00");
+    _defineProperty(_assertThisInitialized(_this), "status", "");
 
+    _defineProperty(_assertThisInitialized(_this), "seconds", 0);
+
+    _this.state = {
+      time: 0,
+      id: 0
+    };
+    _this.saveGame = _this.saveGame.bind(_assertThisInitialized(_this));
+    _this.createGame = _this.createGame.bind(_assertThisInitialized(_this));
+    _this.openGame = _this.openGame.bind(_assertThisInitialized(_this));
+    _this.listGames = _this.listGames.bind(_assertThisInitialized(_this));
     return _this;
   }
 
   _createClass(Grid, [{
     key: "saveGame",
-    value: function saveGame() {}
+    value: function saveGame() {
+      alert("Game saved!");
+    }
   }, {
-    key: "createBoard",
-    value: function createBoard() {
+    key: "createGame",
+    value: function createGame() {
       var _this2 = this;
 
-      var grid = document.querySelector('.grid');
-      var bombsArray = Array(this.bombAmount).fill('bomb');
-      var emptyArray = Array(this.cells - this.bombAmount).fill('valid');
-      var gameArray = emptyArray.concat(bombsArray);
-      var firstPass = gameArray.sort(function () {
-        return Math.random() - 0.5;
+      var bombAmount = prompt("Enter bomb amount (max 50)");
+
+      if (Number(bombAmount) > 50) {
+        alert("Bomb amount should be less than 50");
+        return;
+      }
+
+      axios__WEBPACK_IMPORTED_MODULE_2___default().post("http://localhost:8000/api/games/create", {
+        "width": 10,
+        "bombAmount": bombAmount
+      }).then(function (response) {
+        _this2.width = response.data.width;
+        _this2.cells = response.data.width * response.data.width;
+        _this2.bombAmount = response.data.bomb_amount;
+        _this2.status = response.data.status;
+
+        _this2.setState({
+          time: response.data.elapsed_time
+        });
+
+        _this2.setState({
+          id: response.data.id
+        });
+
+        _this2.createBoard(JSON.parse(response.data.grid));
+
+        console.log("Bomb amount: " + _this2.bombAmount);
+      })["catch"](function (error) {
+        console.log(error);
       });
-      var secondPass = firstPass.sort(function () {
-        return Math.random() - 0.5;
-      });
-      var shuffledArray = secondPass.sort(function () {
-        return Math.random() - 0.5;
-      });
+    }
+  }, {
+    key: "openGame",
+    value: function openGame() {}
+  }, {
+    key: "listGames",
+    value: function listGames() {}
+  }, {
+    key: "createBoard",
+    value: function createBoard(shuffledArray) {
+      var _this3 = this;
+
+      var grid = document.querySelector('.grid'); // const bombsArray = Array(this.bombAmount).fill('bomb');
+      // const emptyArray = Array(this.cells - this.bombAmount).fill('valid');
+      // const gameArray = emptyArray.concat(bombsArray);
+      // const firstPass = gameArray.sort(() => Math.random() -0.5);
+      // const secondPass = firstPass.sort(() => Math.random() - 0.5);
+      // const shuffledArray = secondPass.sort(() => Math.random() - 0.5);
+      // const shuffledArray = gameArray
+
       console.log(shuffledArray); //
 
       var _loop = function _loop(i) {
@@ -2005,19 +2054,17 @@ var Grid = /*#__PURE__*/function (_React$Component) {
         square.classList.add(shuffledArray[i]);
         grid.appendChild(square);
 
-        _this2.squares.push(square); //normal click
+        _this3.squares.push(square); //normal click
 
 
         square.addEventListener('click', function (e) {
-          e.preventDefault();
-
-          _this2.click(square);
+          _this3.click(square);
         }); //cntrl and left click
 
         square.oncontextmenu = function (e) {
           e.preventDefault();
 
-          _this2.addFlag(square);
+          _this3.addFlag(square);
         };
       };
 
@@ -2044,10 +2091,17 @@ var Grid = /*#__PURE__*/function (_React$Component) {
           this.squares[_i].setAttribute('data', total);
         }
       }
+
+      setInterval(function () {
+        _this3.setState({
+          time: _this3.seconds++
+        });
+      }, 1000);
     }
   }, {
     key: "click",
     value: function click(square) {
+      console.log("Square clicked!");
       var currentId = square.id;
       if (this.isGameOver) return;
       if (square.classList.contains('checked') || square.classList.contains('flag')) return;
@@ -2075,91 +2129,91 @@ var Grid = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "checkSquare",
     value: function checkSquare(square, currentId) {
-      var _this3 = this;
+      var _this4 = this;
 
+      console.log("Check. Current id: " + currentId);
       var inLeft = currentId % this.width === 0;
       var inRight = currentId % this.width === this.width - 1;
-      console.log("Check. Current id: " + currentId);
       if (inRight) console.log("In right edge...");
       if (inLeft) console.log("In left edge...");
       setTimeout(function () {
         if (currentId >= 0 && !inLeft) {
-          var newId = _this3.squares[parseInt(currentId) - 1].id;
+          var newId = _this4.squares[parseInt(currentId) - 1].id;
 
           console.log("Next id is: " + newId);
           var newSquare = document.getElementById(newId);
 
-          _this3.click(newSquare);
+          _this4.click(newSquare);
         }
 
         if (currentId >= 9 && !inRight) {
-          var _newId = _this3.squares[parseInt(currentId) + 1 - _this3.width].id;
+          var _newId = _this4.squares[parseInt(currentId) + 1 - _this4.width].id;
 
           console.log("Next id is: " + _newId);
 
           var _newSquare = document.getElementById(_newId);
 
-          _this3.click(_newSquare);
+          _this4.click(_newSquare);
         }
 
         if (currentId >= 10) {
-          var _newId2 = _this3.squares[parseInt(currentId) - _this3.width].id;
+          var _newId2 = _this4.squares[parseInt(currentId) - _this4.width].id;
 
           console.log("Next id is: " + _newId2);
 
           var _newSquare2 = document.getElementById(_newId2);
 
-          _this3.click(_newSquare2);
+          _this4.click(_newSquare2);
         }
 
         if (currentId >= 11 && !inLeft) {
-          var _newId3 = _this3.squares[parseInt(currentId) - 1 - _this3.width].id;
+          var _newId3 = _this4.squares[parseInt(currentId) - 1 - _this4.width].id;
 
           console.log("Next id is: " + _newId3);
 
           var _newSquare3 = document.getElementById(_newId3);
 
-          _this3.click(_newSquare3);
+          _this4.click(_newSquare3);
         }
 
         if (currentId <= 98 && !inRight) {
-          var _newId4 = _this3.squares[parseInt(currentId) + 1].id;
+          var _newId4 = _this4.squares[parseInt(currentId) + 1].id;
 
           console.log("Next id is: " + _newId4);
 
           var _newSquare4 = document.getElementById(_newId4);
 
-          _this3.click(_newSquare4);
+          _this4.click(_newSquare4);
         }
 
         if (currentId <= 90 && !inLeft) {
-          var _newId5 = _this3.squares[parseInt(currentId) - 1 + _this3.width].id;
+          var _newId5 = _this4.squares[parseInt(currentId) - 1 + _this4.width].id;
 
           console.log("Next id is: " + _newId5);
 
           var _newSquare5 = document.getElementById(_newId5);
 
-          _this3.click(_newSquare5);
+          _this4.click(_newSquare5);
         }
 
         if (currentId <= 88 && !inRight) {
-          var _newId6 = _this3.squares[parseInt(currentId) + 1 + _this3.width].id;
+          var _newId6 = _this4.squares[parseInt(currentId) + 1 + _this4.width].id;
 
           console.log("Next id is: " + _newId6);
 
           var _newSquare6 = document.getElementById(_newId6);
 
-          _this3.click(_newSquare6);
+          _this4.click(_newSquare6);
         }
 
         if (currentId <= 89) {
-          var _newId7 = _this3.squares[parseInt(currentId) + _this3.width].id;
+          var _newId7 = _this4.squares[parseInt(currentId) + _this4.width].id;
 
           console.log("Next id is: " + _newId7);
 
           var _newSquare7 = document.getElementById(_newId7);
 
-          _this3.click(_newSquare7);
+          _this4.click(_newSquare7);
         }
       }, 10);
     }
@@ -2217,34 +2271,56 @@ var Grid = /*#__PURE__*/function (_React$Component) {
     }
   }, {
     key: "componentDidMount",
-    value: function componentDidMount() {
-      this.createBoard();
+    value: function componentDidMount() {//this.createBoard();
     }
   }, {
     key: "render",
     value: function render() {
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
         className: "container",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+          className: "row",
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+            className: "col-lg-12"
+          })
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+          className: "row",
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+            className: "col-lg-12",
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+              className: "grid"
+            })
+          })
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
           className: "row",
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
             className: "col-lg-12",
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
-              className: "grid"
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
-              id: "result",
-              children: "In Game!"
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
+              id: "result"
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("span", {
+              className: "my-auto",
               id: "flagsLeft",
               children: ["Remaining flags: ", this.bombAmount]
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("span", {
-              children: ["Ellapsed time: ", this.time]
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("button", {
               className: "float-right",
+              children: ["Ellapsed time: ", this.state.time.toString()]
+            })]
+          })
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+          className: "row",
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
+            className: "col-md-12",
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("button", {
+              className: "btn btn-primary",
+              onClick: this.createGame,
+              children: "New game"
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("button", {
+              className: "btn btn-primary ml-1",
+              onClick: this.saveGame,
               children: "Save game"
             })]
           })
-        })
+        })]
       });
     }
   }]);

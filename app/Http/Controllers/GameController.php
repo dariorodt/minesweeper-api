@@ -44,8 +44,8 @@ class GameController extends Controller
         $grid = array_merge($bombs_array, $valid_array);
         shuffle($grid);
         $status = "active";
-        $elapsed_time = "00:00";
-        $user_id = "1";
+        $elapsed_time = 0;
+        $user_id = 1;
 
         $game = new Game;
 
@@ -105,8 +105,10 @@ class GameController extends Controller
         $game->status = $request->status;
         $game->elapsed_time = $request->elapsed_time;
         $game->user_id = $request->user_id;
-        $game->save();
-        return response()->json($request->all());
+        if($game->save())
+            return response("success", 201);
+        else
+            return response('error', 500);
     }
 
     /**

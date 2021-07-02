@@ -20,7 +20,7 @@ class CreateGamesTable extends Migration
             $table->integer('bomb_amount');
             $table->json('grid');
             $table->enum('status', ['active', 'lost', 'won']);
-            $table->time('elapsed_time', $precision = 0);
+            $table->integer('elapsed_time')->default(0);
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
 
