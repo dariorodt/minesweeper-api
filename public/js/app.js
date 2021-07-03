@@ -2014,11 +2014,14 @@ var Grid = /*#__PURE__*/function (_React$Component) {
       this.status = "";
       this.seconds = 0;
       this.flags = 0;
+      document.querySelector('#newGameBtn').removeAttribute('disabled');
+      document.querySelector('#newGameBtn').removeAttribute('disabled');
       clearInterval(this.timer);
       this.setState({
         time: 0,
         id: 0
       });
+      this.listGames();
     }
   }, {
     key: "createGame",
@@ -2051,6 +2054,7 @@ var Grid = /*#__PURE__*/function (_React$Component) {
 
         _this2.createBoard(JSON.parse(resp.data.grid));
 
+        document.querySelector('#newGameBtn').setAttribute('disabled', 'disabled');
         console.log("Bomb amount: " + _this2.bombAmount);
       })["catch"](function (error) {
         console.log(error);
@@ -2385,10 +2389,12 @@ var Grid = /*#__PURE__*/function (_React$Component) {
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
             className: "col-md-12",
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("button", {
+              id: "newGameBtn",
               className: "btn btn-primary",
               onClick: this.createGame,
               children: "New game"
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("button", {
+              id: "saveGameBtn",
               className: "btn btn-primary ml-1",
               onClick: this.saveGame,
               children: "Save game"

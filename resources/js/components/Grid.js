@@ -51,8 +51,11 @@ class Grid extends React.Component {
         this.status = "";
         this.seconds = 0;
         this.flags = 0;
+        document.querySelector('#newGameBtn').removeAttribute('disabled');
+        document.querySelector('#newGameBtn').removeAttribute('disabled');
         clearInterval(this.timer);
         this.setState({time: 0, id: 0});
+        this.listGames();
     }
 
     createGame() {
@@ -69,6 +72,7 @@ class Grid extends React.Component {
             this.setState({time: resp.data.elapsed_time});
             this.setState({id: resp.data.id});
             this.createBoard(JSON.parse(resp.data.grid));
+            document.querySelector('#newGameBtn').setAttribute('disabled', 'disabled');
             console.log("Bomb amount: " + this.bombAmount);
         }).catch((error) => {
             console.log(error);
@@ -319,8 +323,8 @@ class Grid extends React.Component {
                 </div>
                 <div className="row">
                     <div className="col-md-12">
-                        <button className="btn btn-primary" onClick={this.createGame}>New game</button>
-                        <button className="btn btn-primary ml-1" onClick={this.saveGame}>Save game</button>
+                        <button id="newGameBtn" className="btn btn-primary" onClick={this.createGame}>New game</button>
+                        <button id="saveGameBtn" className="btn btn-primary ml-1" onClick={this.saveGame}>Save game</button>
                         <a className="btn btn-info float-right" href="/home">Go to Home Page</a>
                     </div>
                 </div>
